@@ -17,7 +17,7 @@ print(duplicate)
 # Input: [1,3,5], [2,4,6]
 # Output: [1,2,3,4,5,6]
 
-arr1 = [1,3,5]
+arr1 = [1,4,3,5]
 arr2=[2,4,6]
 merged_arr = []
 for i in arr1:
@@ -37,8 +37,9 @@ for i in range(len(merged_arr)):
        
 print(f"Sorted Array:{merged_arr}")
 
-# using sorted method 
+# # using sorted method 
 
-print(f"Unsorted array:{merged_arr}")
-sorted_arr = sorted(merged_arr)
-print(f"Sorted array:{sorted_arr}")
+# print(f"Unsorted array:{merged_arr}")
+# sorted_arr = sorted(merged_arr)
+# print(f"Sorted array:{sorted_arr}")
+
