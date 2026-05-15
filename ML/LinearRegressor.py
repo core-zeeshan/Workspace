@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 # Calculates the average (mean) of a list of numbers
 def mean(x):
     total = 0
@@ -32,8 +35,11 @@ def sum_of_squares(values):
 # Calculates predicted y values using the line equation: y = w1*x + w0
 def prediction(x, w1, w0):
     y_pred = []
+
     for i in x:
-        y_pred.append(round(w1 * i + w0, 2))
+        a = w1 * i + w0
+        y_pred.append(a)
+
     return y_pred
 
 
@@ -59,12 +65,11 @@ def error_print(y, y_pred):
         print(f"(Y:{y[i]} - y_pred:{y_pred[i]})^2 = {round(z, 2)}")
 
 # Generates slope (w1) using Lasso Regression
-# Generates slope (w1) using Lasso Regression
 def lasso_w1(a, b, alpha):
 
     omega = dot_product(a, b)
 
-    numerator = max(0, abs(omega) - alpha)
+    numerator = max(0, abs(omega) - alpha) 
 
     # restore sign
     if omega < 0:
@@ -99,6 +104,7 @@ def linear_regression(x, y):
     error_print(y, y_pred)
     print(f"Error: {total_error}")
     print(f"Avg Error: {total_error / len(x)}")
+    # print(f"For exp 14:{w1*14+w0}")
 
 # Runs lasso regression for multiple alpha values
 def linear_regression_lasso(x, y, alphas):
@@ -120,6 +126,7 @@ def linear_regression_lasso(x, y, alphas):
         errors = error_list(y, y_pred)
 
         total_error = total_sum(errors)
+        # print(f"For exp 14:{w1*14+w0}")
 
         print("\n========================")
         print(f"Alpha: {alpha}")
@@ -128,30 +135,125 @@ def linear_regression_lasso(x, y, alphas):
         print(f"Total Error: {round(total_error,2)}")
         print(f"Avg Error: {round(total_error/len(x),2)}")
 
-x = [1, 2, 2.5, 3, 4, 4.5, 5, 6, 6.5, 7,
-     8, 8.5, 9, 10, 11, 12, 13, 14, 15, 16,
-     17, 17.5, 18, 19, 19.5, 20, 21, 21.5, 22, 23,
-     23.5, 24, 25, 25.5, 26, 27, 27.5, 28, 29, 29.5,
-     30, 31, 31.5, 32, 33, 33.5, 34, 35, 35.5, 36,
-     37, 37.5, 38, 39, 39.5, 40, 41, 41.5, 42, 43,
-     43.5, 44, 45, 45.5, 46, 47, 47.5, 48, 49, 49.5,
-     50, 51, 51.5, 52, 53, 53.5, 54, 55, 55.5, 56,
-     57, 57.5, 58, 59, 59.5, 60, 61, 61.5, 62, 63,
-     63.5, 64, 65, 65.5, 66, 67, 67.5, 68, 69, 69.5]
-y = [35, 40, 42, 45, 50, 52, 55, 60, 63, 65,
-     70, 72, 75, 78, 82, 85, 88, 90, 93, 95,
-     100, 102, 105, 108, 110, 112, 115, 118, 120, 123,
-     125, 128, 130, 133, 135, 138, 140, 143, 145, 148,
-     150, 153, 155, 158, 160, 163, 165, 168, 170, 173,
-     175, 178, 180, 183, 185, 188, 190, 193, 195, 198,
-     200, 203, 205, 208, 210, 213, 215, 218, 220, 223,
-     225, 228, 230, 233, 235, 238, 240, 243, 245, 248,
-     250, 253, 255, 258, 260, 263, 265, 268, 270, 273,
-     275, 278, 280, 283, 285, 288, 290, 293, 295, 298]
 
 
-print(linear_regression(x,y))
-alphas = [0, 0.5, 1, 1.5, 2, 2.5]
 
-linear_regression_lasso(x, y, alphas)
+# Function to plot Linear Regression and Lasso Regression
+def plot_graph(x, y, alphas):
 
+    # ----- Normal Linear Regression -----
+    avg_x = mean(x)
+    avg_y = mean(y)
+
+    a = subtract_mean(x, avg_x)
+    b = subtract_mean(y, avg_y)
+
+    w1 = dot_product(a, b) / sum_of_squares(a)
+    w0 = avg_y - w1 * avg_x
+
+    y_pred = prediction(x, w1, w0)
+
+    # Plot actual points
+    plt.scatter(x, y, label="Actual Data")
+
+    # Plot normal regression line
+    plt.plot(x, y_pred, label="Linear Regression")
+
+    # ----- Lasso Regression Lines -----
+    for alpha in alphas:
+
+        w1_lasso = lasso_w1(a, b, alpha)
+
+        w0_lasso = avg_y - w1_lasso * avg_x
+
+        y_lasso = prediction(x, w1_lasso, w0_lasso)
+        
+
+        plt.plot(x, y_lasso, label=f"Lasso alpha={alpha}")
+
+    # Labels and title
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Linear Regression vs Lasso Regression")
+
+    plt.legend()
+    plt.grid(True)
+
+    plt.show()
+def predict_new_value(x, y, alphas, new_x):
+
+    avg_x = mean(x)
+    avg_y = mean(y)
+
+    a = subtract_mean(x, avg_x)
+    b = subtract_mean(y, avg_y)
+
+    # ----- Linear Regression -----
+    w1 = dot_product(a, b) / sum_of_squares(a)
+
+    w0 = avg_y - w1 * avg_x
+
+    linear_pred = round(w1 * new_x + w0, 2)
+
+    print("Linear Regression Prediction")
+  
+
+    print(f"Input X: {new_x}")
+    print(f"Predicted Y: {linear_pred}")
+
+    # ----- Lasso Regression -----
+    print("Lasso Regression Predictions")
+
+    for alpha in alphas:
+
+        w1_lasso = lasso_w1(a, b, alpha)
+
+        w0_lasso = avg_y - w1_lasso * avg_x
+
+        lasso_pred = round(w1_lasso * new_x + w0_lasso, 2)
+
+        print(f"\nAlpha: {alpha}")
+        print(f"w1: {round(w1_lasso,4)}")
+        print(f"w0: {round(w0_lasso,4)}")
+        print(f"Predicted Y: {lasso_pred}")
+
+# x = [1, 2, 2.5, 3, 4, 4.5, 5, 6, 6.5, 7,
+#      8, 8.5, 9, 10, 11, 12, 13, 14, 15, 16,
+#      17, 17.5, 18, 19, 19.5, 20, 21, 21.5, 22, 23,
+#      23.5, 24, 25, 25.5, 26, 27, 27.5, 28, 29, 29.5,
+#      30, 31, 31.5, 32, 33, 33.5, 34, 35, 35.5, 36,
+#      37, 37.5, 38, 39, 39.5, 40, 41, 41.5, 42, 43,
+#      43.5, 44, 45, 45.5, 46, 47, 47.5, 48, 49, 49.5,
+#      50, 51, 51.5, 52, 53, 53.5, 54, 55, 55.5, 56,
+#      57, 57.5, 58, 59, 59.5, 60, 61, 61.5, 62, 63,
+#      63.5, 64, 65, 65.5, 66, 67, 67.5, 68, 69, 69.5]
+# y = [35, 40, 42, 45, 50, 52, 55, 60, 63, 65,
+#      70, 72, 75, 78, 82, 85, 88, 90, 93, 95,
+#      100, 102, 105, 108, 110, 112, 115, 118, 120, 123,
+#      125, 128, 130, 133, 135, 138, 140, 143, 145, 148,
+#      150, 153, 155, 158, 160, 163, 165, 168, 170, 173,
+#      175, 178, 180, 183, 185, 188, 190, 193, 195, 198,
+#      200, 203, 205, 208, 210, 213, 215, 218, 220, 223,
+#      225, 228, 230, 233, 235, 238, 240, 243, 245, 248,
+#      250, 253, 255, 258, 260, 263, 265, 268, 270, 273,
+#      275, 278, 280, 283, 285, 288, 290, 293, 295, 298]
+df = pd.read_csv(r"C:\Users\zeesh\OneDrive\Desktop\Workspace\ML\Salary_dataset.csv")
+df=df.dropna()
+x = df["Years of Experience"].tolist()
+y= df["Salary"].tolist()
+# y1 = list(map(lambda x: round(x),y))
+# x1 = list(map(lambda x: round(x),x))
+y2=list(map(lambda x: x//100,y))
+print(len(x))
+# x1[100]=1000000
+# x1[248]=1
+# x1[56]-0
+
+
+linear_regression(x, y2)
+
+# alphas = [0, 0.5, 1, 1.5, 2, 2.5]
+alphas = [0, 10, 50, 100, 500, 1000, 5000, 10000]
+
+linear_regression_lasso(x, y2, alphas)
+plot_graph(x,y2,alphas)
